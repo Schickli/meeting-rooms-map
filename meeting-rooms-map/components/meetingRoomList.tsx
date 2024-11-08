@@ -7,7 +7,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { ScrollArea } from "@radix-ui/react-scroll-area";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { RoomCard } from "./roomCard";
 import { RoomCardSkeleton } from "./roomCardSceleton";
 
@@ -30,17 +30,16 @@ export function MeetingRoomList({
   }, [currentFocus?.id]);
 
   return (
-    <Card className="bg-gray-800 border-gray-700 h-[98vh]">
+    <Card className="bg-gray-800 border-gray-700">
       <CardHeader className="pb-4">
         <CardTitle className="text-gray-100">Meeting Rooms</CardTitle>
         <CardDescription className="text-gray-400">
           Available spaces for your meetings
         </CardDescription>
       </CardHeader>
-      <CardContent className="relative p-0 h-full flex-1">
-        <div className="absolute w-full z-50 bottom-0 h-24 bg-gradient-to-t from-black/80 rounded-b-full"></div>
-        <ScrollArea className="full px-6">
-          <div className="space-y-4">
+      <CardContent className="relative p-0 h-[89vh] overflow-hidden">
+        <ScrollArea className="w-full px-6">
+          <div className="space-y-4 h-[85vh]">
             {rooms &&
               rooms.map((room) => (
                 <div
@@ -63,7 +62,7 @@ export function MeetingRoomList({
               </div>
             )}
 
-            {rooms && (
+            {!rooms && (
               <>
                 <RoomCardSkeleton />
                 <RoomCardSkeleton />

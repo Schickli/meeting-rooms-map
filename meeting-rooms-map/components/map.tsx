@@ -12,7 +12,7 @@ interface MapProps {
   tilesetId?: string;
   height?: string;
   points: MeetingRoom[] | null;
-  onFocusChange: (point: MeetingRoom | null) => void;
+  onFocusChange: (point: MeetingRoom) => void;
 }
 
 export function Map({
@@ -84,54 +84,6 @@ export function Map({
           },
         });
 
-        if (points) {
-          points.forEach((point) => {
-            const el = document.createElement("div");
-            el.className = "marker " + point.status;
-            el.style.height = "15px"; // Increase the size
-            el.style.width = "15px"; // Increase the size
-            el.style.borderRadius = "50%";
-            el.style.position = "relative";
-            el.style.boxShadow = `0px 0px 4px 2px ${getStatusShadowColor(
-              point.status
-            )}`;
-            el.style.transform = "translate(-50%, -50%)"; // Center the marker
-            el.style.cursor = "pointer";
-
-            const invisibleBox = document.createElement("div");
-            invisibleBox.style.position = "absolute";
-            invisibleBox.style.top = "-10px";
-            invisibleBox.style.left = "-10px";
-            invisibleBox.style.height = "30px";
-            invisibleBox.style.width = "30px";
-            invisibleBox.style.opacity = "0";
-            invisibleBox.style.cursor = "pointer";
-
-            const markerContainer = document.createElement("div");
-            markerContainer.className = "flex items-center";
-            markerContainer.style.position = "absolute";
-            markerContainer.appendChild(el);
-            markerContainer.appendChild(invisibleBox);
-
-            new mapboxgl.Marker(markerContainer)
-              .setLngLat(point.coordinates)
-              .addTo(map.current!);
-
-            markerContainer.addEventListener("click", () => {
-              onFocusChange(point);
-              setActivePoint(point);
-            });
-          });
-        }
-
-        // Handle overall map click to reset active point
-        map.current?.on("click", (e) => {
-          if (!e.defaultPrevented) {
-            onFocusChange(null);
-            setActivePoint(null);
-          }
-        });
-
         setMapStatus("success");
       });
     } catch (err: any) {
@@ -147,7 +99,55 @@ export function Map({
         map.current.remove();
       }
     };
-  }, [tilesetId, points]);
+  }, [tilesetId]);
+
+  useEffect(() => {
+    if (map.current && map.current._markers && map.current._markers.length > 0) {
+      map.current._markers.forEach((marker: any) => {
+        marker.remove();
+      });
+    }
+
+    if (points) {
+      points.forEach((point) => {
+        const el = document.createElement("div");
+        el.className = "marker " + point.status;
+        el.style.height = "15px"; // Increase the size
+        el.style.width = "15px"; // Increase the size
+        el.style.borderRadius = "50%";
+        el.style.position = "relative";
+        el.style.boxShadow = `0px 0px 4px 2px ${getStatusShadowColor(
+          point.status
+        )}`;
+        el.style.transform = "translate(-50%, -50%)"; // Center the marker
+        el.style.cursor = "pointer";
+
+        const invisibleBox = document.createElement("div");
+        invisibleBox.style.position = "absolute";
+        invisibleBox.style.top = "-10px";
+        invisibleBox.style.left = "-10px";
+        invisibleBox.style.height = "30px";
+        invisibleBox.style.width = "30px";
+        invisibleBox.style.opacity = "0";
+        invisibleBox.style.cursor = "pointer";
+
+        const markerContainer = document.createElement("div");
+        markerContainer.className = "flex items-center";
+        markerContainer.style.position = "absolute";
+        markerContainer.appendChild(el);
+        markerContainer.appendChild(invisibleBox);
+
+        new mapboxgl.Marker(markerContainer)
+          .setLngLat(point.coordinates)
+          .addTo(map.current!);
+
+        markerContainer.addEventListener("click", () => {
+          onFocusChange(point);
+          setActivePoint(point);
+        });
+      });
+    }
+  }, [points]);
 
   return (
     <div className={`relative w-full ${height} overflow-hidden`}>
@@ -156,9 +156,7 @@ export function Map({
       )}
       <div
         ref={mapContainer}
-        className={`w-full h-full overflow-hidden rounded-lg ${
-          mapStatus === "loading" ? "invisible" : "visible"
-        }`}
+        className={`w-full h-full overflow-hidden rounded-lg`}
       />
     </div>
   );

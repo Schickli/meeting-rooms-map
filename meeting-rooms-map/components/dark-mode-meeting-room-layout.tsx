@@ -103,7 +103,9 @@ export function DarkModeMeetingRoomLayout() {
     loadMeetingRooms();
   }, []);
 
-  const handleFocusChange = (room: MeetingRoom | null) => setCurrentFocus(room);
+  const handleFocusChange = (room: MeetingRoom | null) => {
+    setCurrentFocus(room);
+  };
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-900 text-gray-100">
