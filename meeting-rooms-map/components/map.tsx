@@ -132,7 +132,6 @@ export function Map({
           }
         });
 
-        throw new Error();
         setMapStatus("success");
 
       });
