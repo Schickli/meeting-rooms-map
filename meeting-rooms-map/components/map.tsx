@@ -11,7 +11,7 @@ interface MapProps {
   coordinates?: [number, number];
   tilesetId?: string;
   height?: string;
-  points: MeetingRoom[];
+  points: MeetingRoom[] | null;
   onFocusChange: (point: MeetingRoom | null) => void;
 }
 
@@ -24,11 +24,9 @@ export function Map({
 }: MapProps) {
   const mapContainer = useRef<HTMLDivElement | null>(null);
   const map = useRef<MapboxMap | null>(null);
-  const [mapStatus, setMapStatus] = useState<"loading" | "success">(
-    "loading"
-  );
+  const [mapStatus, setMapStatus] = useState<"loading" | "success">("loading");
   const [activePoint, setActivePoint] = useState<MeetingRoom | null>(null);
-  const { toast } = useToast()
+  const { toast } = useToast();
 
   useEffect(() => {
     if (map.current || !mapContainer.current) return;
@@ -38,8 +36,8 @@ export function Map({
     if (!token) {
       toast({
         title: "Token required",
-        variant: "destructive"
-      })
+        variant: "destructive",
+      });
       return;
     }
 
@@ -86,43 +84,45 @@ export function Map({
           },
         });
 
-        points.forEach((point) => {
-          const el = document.createElement("div");
-          el.className = "marker " + point.status;
-          el.style.height = "15px"; // Increase the size
-          el.style.width = "15px"; // Increase the size
-          el.style.borderRadius = "50%";
-          el.style.position = "relative";
-          el.style.boxShadow = `0px 0px 4px 2px ${getStatusShadowColor(
-            point.status
-          )}`;
-          el.style.transform = "translate(-50%, -50%)"; // Center the marker
-          el.style.cursor = "pointer";
+        if (points) {
+          points.forEach((point) => {
+            const el = document.createElement("div");
+            el.className = "marker " + point.status;
+            el.style.height = "15px"; // Increase the size
+            el.style.width = "15px"; // Increase the size
+            el.style.borderRadius = "50%";
+            el.style.position = "relative";
+            el.style.boxShadow = `0px 0px 4px 2px ${getStatusShadowColor(
+              point.status
+            )}`;
+            el.style.transform = "translate(-50%, -50%)"; // Center the marker
+            el.style.cursor = "pointer";
 
-          const invisibleBox = document.createElement("div");
-          invisibleBox.style.position = "absolute";
-          invisibleBox.style.top = "-10px";
-          invisibleBox.style.left = "-10px";
-          invisibleBox.style.height = "30px";
-          invisibleBox.style.width = "30px";
-          invisibleBox.style.opacity = "0";
-          invisibleBox.style.cursor = "pointer";
+            const invisibleBox = document.createElement("div");
+            invisibleBox.style.position = "absolute";
+            invisibleBox.style.top = "-10px";
+            invisibleBox.style.left = "-10px";
+            invisibleBox.style.height = "30px";
+            invisibleBox.style.width = "30px";
+            invisibleBox.style.opacity = "0";
+            invisibleBox.style.cursor = "pointer";
 
-          const markerContainer = document.createElement("div");
-          markerContainer.className = "flex items-center";
-          markerContainer.style.position = "absolute";
-          markerContainer.appendChild(el);
-          markerContainer.appendChild(invisibleBox);
+            const markerContainer = document.createElement("div");
+            markerContainer.className = "flex items-center";
+            markerContainer.style.position = "absolute";
+            markerContainer.appendChild(el);
+            markerContainer.appendChild(invisibleBox);
 
-          new mapboxgl.Marker(markerContainer)
-            .setLngLat(point.coordinates)
-            .addTo(map.current!);
+            new mapboxgl.Marker(markerContainer)
+              .setLngLat(point.coordinates)
+              .addTo(map.current!);
 
-          markerContainer.addEventListener("click", () => {
-            onFocusChange(point);
-            setActivePoint(point);
+            markerContainer.addEventListener("click", () => {
+              onFocusChange(point);
+              setActivePoint(point);
+            });
           });
-        });
+        }
 
         // Handle overall map click to reset active point
         map.current?.on("click", (e) => {
@@ -133,13 +133,12 @@ export function Map({
         });
 
         setMapStatus("success");
-
       });
-    } catch (err:any) {
+    } catch (err: any) {
       toast({
         title: err,
-        variant: "destructive"
-      })
+        variant: "destructive",
+      });
     }
 
     // Cleanup on unmount
