@@ -169,7 +169,10 @@ export function DarkModeMeetingRoomLayout() {
                               <Tooltip>
                                 <TooltipTrigger asChild>
                                   <div className="mr-2 hover:bg-slate-500 p-1 rounded-full">
-                                    <Link href={"https://www.example.com"} target="_blank">
+                                    <Link
+                                      href={"https://www.example.com"}
+                                      target="_blank"
+                                    >
                                       <SquareArrowOutUpRight
                                         color="white"
                                         size={18}
@@ -179,10 +182,9 @@ export function DarkModeMeetingRoomLayout() {
                                 </TooltipTrigger>
                                 <TooltipContent>Book this room</TooltipContent>
                               </Tooltip>
-
                               <div
                                 className={`w-3 h-3 rounded-full ${room.status}`}
-                              />
+                              ></div>
                               <span className="text-sm text-gray-400">
                                 {getStatusName(room.status)}
                               </span>
